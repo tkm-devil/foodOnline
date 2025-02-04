@@ -15,7 +15,7 @@ def registerUser(request):
             user.role = User.CUSTOMER
             user.save()
             messages.success(request, 'Account created successfully! Please login.')
-            return redirect('login_view')
+            return redirect('registerUser')
         else:
             messages.error(request, 'Please correct the error below.') # Display general error message
     else:

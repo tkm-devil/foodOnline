@@ -1,0 +1,25 @@
+@keyframes show-toast {
+    0% {
+        transform: translateY(-100%); /* Starts above the screen */
+    }
+    10% {
+        transform: translateY(20px); /* Slightly below top of the screen */
+    }
+    60% {
+        transform: translateY(20px); /* Keeps the toast in place for visibility */
+    }
+    90% {
+        transform: translateY(20px); /* Keeps the toast in place */
+    }
+    100% {
+        transform: translateY(-100%); /* Moves the toast off-screen again */
+    }
+}
+
+.show-notification {
+    position: fixed;
+    top: 0;
+    right: 20px;
+    z-index: 9999; /* Ensures it's on top of other elements */
+    animation: show-toast 4s ease-in-out forwards; /* Adjusted duration */
+}
