@@ -11,8 +11,17 @@
                     <div class="user-dashboard loader-holder">
                         <div class="user-holder">
                             <h4 class="text-center" style="margin-bottom: 0;">WELCOME TO FOODONLINE</h4>
-                            <p class="text-center">Please fill this form to get yourself onboarded in the foodOnline marketplace.</p>
+                            <p class="text-center">Please fill this form to get yourself onboarded in the FoodOnline marketplace.</p>
                             <hr>
+
+                            <!-- Display Django Messages -->
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
 
                             <!-- Display Form Errors -->
                             {% if form.errors %}
@@ -20,7 +29,7 @@
                                 <ul>
                                     {% for field, errors in form.errors.items %}
                                         {% for error in errors %}
-                                            <li>{{ error }}</li>
+                                            <li><strong>{{ field|title }}</strong>: {{ error }}</li>
                                         {% endfor %}
                                     {% endfor %}
                                 </ul>
@@ -39,27 +48,37 @@
                                                             <li>
                                                                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="field-holder">
-                                                                        <label>First name</label>{{ form.first_name }}
+                                                                        <label>First Name</label>
+                                                                        {{ form.first_name }}
+                                                                        <small class="text-danger">{{ form.first_name.errors|first }}</small>
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="field-holder">
-                                                                        <label>Last name</label>{{ form.last_name }}
+                                                                        <label>Last Name</label>
+                                                                        {{ form.last_name }}
+                                                                        <small class="text-danger">{{ form.last_name.errors|first }}</small>
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="field-holder">
-                                                                        <label>Email Address</label>{{ form.email }}
+                                                                        <label>Email Address</label>
+                                                                        {{ form.email }}
+                                                                        <small class="text-danger">{{ form.email.errors|first }}</small>
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="field-holder">
-                                                                        <label>Username</label>{{ form.username }}
+                                                                        <label>Username</label>
+                                                                        {{ form.username }}
+                                                                        <small class="text-danger">{{ form.username.errors|first }}</small>
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                                                     <div class="field-holder">
-                                                                        <label>Phone Number</label>{{ form.phone_number }}
+                                                                        <label>Phone Number</label>
+                                                                        {{ form.phone_number }}
+                                                                        <small class="text-danger">{{ form.phone_number.errors|first }}</small>
                                                                     </div>
                                                                 </div>
                                                             </li>
@@ -67,12 +86,16 @@
                                                             <li>
                                                                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                                                     <div class="field-holder">
-                                                                        <label>Password</label>{{ form.password }}
+                                                                        <label>Password</label>
+                                                                        {{ form.password }}
+                                                                        <small class="text-danger">{{ form.password.errors|first }}</small>
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                                                     <div class="field-holder">
-                                                                        <label>Confirm Password</label>{{ form.confirm_password }}
+                                                                        <label>Confirm Password</label>
+                                                                        {{ form.confirm_password }}
+                                                                        <small class="text-danger">{{ form.confirm_password.errors|first }}</small>
                                                                     </div>
                                                                 </div>
                                                             </li>
