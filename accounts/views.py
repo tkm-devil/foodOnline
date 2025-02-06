@@ -81,9 +81,15 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    messages.success(request, "You have been logged out.")
+    messages.info(request, "You have been logged out. Login again to continue.")
     return redirect('login_view')
 
 @login_required
 def dashboard(request):
-    return render(request, "accounts/dashboard.html")
+    user_profile = UserProfile.objects.get(user=request.user)
+
+    context = {
+        "user": request.user,
+        "user_profile": user_profile
+    }
+    return render(request, "accounts/dashboard.html", context)

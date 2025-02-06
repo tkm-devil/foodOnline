@@ -1,12 +1,36 @@
 {% load static %}
 <!--Main Wrapper-->
+<style>
+    .btn-primary {
+        color: #fff;
+        background-color: #c33332;
+        border-color: #c33332;
+    }
+
+    .user-options {
+        display: flex;
+        align-items: center;
+        gap: 10px; /* Adds space between elements */
+    }
+
+    .user-options span {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .user-buttons {
+        display: flex;
+        gap: 10px;
+    }
+</style>
+
 <div class="wrapper">
     <!-- Header Start -->
     <header id="header">
         <div class="main-header">
             <div class="container">
-                <div class="row">
-                    <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+                <div class="row align-items-center">
+                    <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 d-flex align-items-center">
                         <div class="logo">
                             <figure>
                                 <a href="{% url 'home' %}" class="light-logo">
@@ -28,18 +52,21 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                        <div class="login-option">
-                            <a class="cs-color cs-popup-joinus-btn login-popup" href="{% url 'login_view' %}">
-                                Login
-                            </a>
-                            /
-                            <a href="{% url 'registerUser' %}" class="cs-color cs-popup-joinus-btn login-popup ml-1">
-                                Register
-                            </a>
-                            <a class="get-start-btn" href="{% url 'registerVendor' %}">
-                                Register Restaurant
-                            </a>
+                    
+                    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 d-flex justify-content-end">
+                        <div class="user-options">
+                            {% if user.is_authenticated %}
+                                <span>Welcome, {{ user.username }}</span>
+                                <div class="user-buttons">
+                                    <a class="btn btn-secondary" href="{% url 'dashboard' %}">My Account</a>
+                                    <a class="btn btn-primary" href="{% url 'logout_view' %}">Logout</a>
+                                </div>
+                            {% else %}
+                                <a class="cs-color cs-popup-joinus-btn login-popup" href="{% url 'login_view' %}">Login</a>
+                                /
+                                <a href="{% url 'registerUser' %}" class="cs-color cs-popup-joinus-btn login-popup ml-1">Register</a>
+                                <a class="get-start-btn" href="{% url 'registerVendor' %}">Register Restaurant</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
