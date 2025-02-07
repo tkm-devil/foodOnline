@@ -78,7 +78,12 @@
                                     </div>
 
                                     <div class="text-center">
-                                        <button type="submit" class="btn btn-primary w-100">Register</button>
+                                        <button type="submit" id="btn-register-user" class="btn btn-primary w-100">
+                                            Register <span id="spinner-user" class="spinner-border spinner-border-sm d-none"></span>
+                                        </button>
+                                    </div>                                    
+                                    <div class="text-center mt-3">
+                                        <p>Already have an account? <a href="{% url 'login_view' %}" class="text-primary">Login</a></p>
                                     </div>
                                 </form>
                             </div>
@@ -90,5 +95,11 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById("btn-register-user").addEventListener("click", function() {
+        document.getElementById("spinner-user").classList.remove("d-none");
+    });
+</script>
 
 {% endblock %}

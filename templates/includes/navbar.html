@@ -1,76 +1,121 @@
 {% load static %}
 <!--Main Wrapper-->
 <style>
-    .btn-primary {
-        color: #fff;
-        background-color: #c33332;
-        border-color: #c33332;
-    }
+  .btn-primary {
+    color: #fff;
+    background-color: #c33332;
+    border-color: #c33332;
+  }
 
-    .user-options {
-        display: flex;
-        align-items: center;
-        gap: 10px; /* Adds space between elements */
-    }
+  .btn-primary:hover,
+  .btn-primary:focus,
+  .btn-primary:active {
+    color: #fff;
+    background-color: #a72b2b !important; /* Slightly darker red */
+    border-color: #a72b2b !important;
+  }
 
-    .user-options span {
-        font-weight: bold;
-        color: #333;
-    }
+  .btn-secondary {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+  }
 
-    .user-buttons {
-        display: flex;
-        gap: 10px;
-    }
+  .btn-secondary:hover,
+  .btn-secondary:focus,
+  .btn-secondary:active {
+    color: #fff;
+    background-color: #5a6268 !important; /* Slightly darker gray */
+    border-color: #545b62 !important;
+  }
+
+  .user-options {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Adds space between elements */
+  }
+
+  .user-buttons {
+    display: flex;
+    gap: 10px;
+  }
 </style>
 
 <div class="wrapper">
-    <!-- Header Start -->
-    <header id="header">
-        <div class="main-header">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 d-flex align-items-center">
-                        <div class="logo">
-                            <figure>
-                                <a href="{% url 'home' %}" class="light-logo">
-                                    <img src="{% static 'logo/foodOnlineLogo.png' %}" alt="FoodOnline" width="250">
-                                </a>
-                            </figure>
-                        </div>
-                        
-                        <div class="main-location" style="margin-left: 35px;">
-                            <ul>
-                                <li class="location-has-children choose-location">
-                                    <form action="#">
-                                        <input type="text" name="location" placeholder="Enter your delivery location" autocomplete="off">
-                                        <span id="foodbakery_radius_location_open" class="foodbakery-radius-location">
-                                            <i class="icon-target5"></i>
-                                        </span>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 d-flex justify-content-end">
-                        <div class="user-options">
-                            {% if user.is_authenticated %}
-                                <span>Welcome, {{ user.username }}</span>
-                                <div class="user-buttons">
-                                    <a class="btn btn-secondary" href="{% url 'dashboard' %}">My Account</a>
-                                    <a class="btn btn-primary" href="{% url 'logout_view' %}">Logout</a>
-                                </div>
-                            {% else %}
-                                <a class="cs-color cs-popup-joinus-btn login-popup" href="{% url 'login_view' %}">Login</a>
-                                /
-                                <a href="{% url 'registerUser' %}" class="cs-color cs-popup-joinus-btn login-popup ml-1">Register</a>
-                                <a class="get-start-btn" href="{% url 'registerVendor' %}">Register Restaurant</a>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
+  <!-- Header Start -->
+  <header id="header">
+    <div class="main-header">
+      <div class="container">
+        <div class="row align-items-center">
+          <div
+            class="col-lg-8 col-md-8 col-sm-12 col-xs-12 d-flex align-items-center"
+          >
+            <div class="logo">
+              <figure>
+                <a href="{% url 'home' %}" class="light-logo">
+                  <img
+                    src="{% static 'logo/foodOnlineLogo.png' %}"
+                    alt="FoodOnline"
+                    width="250"
+                  />
+                </a>
+              </figure>
             </div>
+
+            <div class="main-location" style="margin-left: 35px">
+              <ul>
+                <li class="location-has-children choose-location">
+                  <form action="#">
+                    <input
+                      type="text"
+                      name="location"
+                      placeholder="Enter your delivery location"
+                      autocomplete="off"
+                    />
+                    <span
+                      id="foodbakery_radius_location_open"
+                      class="foodbakery-radius-location"
+                    >
+                      <i class="icon-target5"></i>
+                    </span>
+                  </form>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div
+            class="col-lg-4 col-md-4 col-sm-12 col-xs-12 d-flex justify-content-end"
+          >
+            <div class="user-options">
+              {% if user.is_authenticated %}
+              <span>Welcome, {{ user.username }}</span>
+              <div class="user-buttons">
+                <a class="btn btn-secondary" href="{% url 'dashboard' %}"
+                  >My Account</a
+                >
+                <a class="btn btn-primary" href="{% url 'logout_view' %}"
+                  >Logout</a
+                >
+              </div>
+              {% else %}
+              <div class="user-buttons">
+                <a class="btn btn-primary" href="{% url 'login_view' %}"
+                  >Login</a
+                >
+                <a class="btn btn-secondary" href="{% url 'registerUser' %}"
+                  >Register</a
+                >
+                <a class="btn btn-primary" href="{% url 'registerVendor' %}"
+                  >Register Restaurant</a
+                >
+              </div>
+              {% endif %}
+            </div>
+          </div>
         </div>
-    </header>
-    <!-- Header End -->
+      </div>
+    </div>
+  </header>
+  <!-- Header End -->
+</div>

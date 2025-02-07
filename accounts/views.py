@@ -7,10 +7,15 @@ from django.contrib.auth.decorators import login_required
 from vendor.forms import VendorRegistrationForm
 from .forms import UserRegistrationForm, LoginForm
 from .models import User, UserProfile
+from .utils import detectUser
 
 # Create your views here.
 
 def registerUser(request):
+    if request.user.is_authenticated:
+        messages.info(request, 'You are already logged in. Please logout to register a new account.')
+        return redirect('home')
+
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
@@ -27,6 +32,10 @@ def registerUser(request):
     return render(request, 'accounts/registerUser.html', {'form': form})
 
 def registerVendor(request):
+    if request.user.is_authenticated:
+        messages.info(request, 'You are already logged in. Please logout to register a new account.')
+        return redirect('home')
+
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         vendor_form = VendorRegistrationForm(request.POST, request.FILES)
@@ -57,7 +66,11 @@ def registerVendor(request):
     return render(request, 'accounts/registerVendor.html', {'form': form, 'vendor_form': vendor_form})
 
 def login_view(request):
-    registration_success = request.session.pop('registration_success', None)
+    if request.user.is_authenticated:
+        messages.info(request, "You are already logged in.")
+        return redirect(detectUser(request.user))  # Redirect to the correct dashboard
+
+    registration_success = request.session.pop("registration_success", None)
     if registration_success:
         messages.success(request, registration_success)
 
@@ -71,7 +84,7 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, "Login successful!")
-                return redirect("home")  # Redirect to home or dashboard
+                return redirect(detectUser(user))  # Redirect to their respective dashboard
             else:
                 messages.error(request, "Invalid email or password")
     else:
@@ -86,10 +99,19 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
-    user_profile = UserProfile.objects.get(user=request.user)
+    redirect_url = detectUser(request.user)  # Get correct dashboard URL
+    return redirect(redirect_url)  # Redirect to the appropriate dashboard
 
-    context = {
-        "user": request.user,
-        "user_profile": user_profile
-    }
-    return render(request, "accounts/dashboard.html", context)
+@login_required
+def customerDashboard(request):
+    if request.user.role != User.CUSTOMER:
+        messages.error(request, "Unauthorized access! You are not a customer.")
+        return redirect("home") 
+    return render(request, "accounts/customerDashboard.html")
+
+@login_required
+def vendorDashboard(request):
+    if request.user.role != User.VENDOR:
+        messages.error(request, "Unauthorized access! You are not a vendor.")
+        return redirect("home")
+    return render(request, "accounts/vendorDashboard.html")
