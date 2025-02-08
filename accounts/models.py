@@ -1,7 +1,12 @@
+import random
+import hashlib
 from django.db import models
+from django.core.mail import send_mail
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from django.core.validators import RegexValidator
 from phonenumber_field.modelfields import PhoneNumberField
+from django.utils.crypto import get_random_string
+from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
 
 # Custom User Manager
 class UserManager(BaseUserManager):
@@ -19,8 +24,18 @@ class UserManager(BaseUserManager):
             username=username,
         )
         user.set_password(password)
+        user.set_otp()
+        user.is_active = False  # Account will only be active after verification
         user.save(using=self._db)
+
+        # Send OTP Email
+        self.send_otp_email(user.email, user.otp)
         return user
+
+    def send_otp_email(self, email, otp):
+        subject = "Email Verification Code"
+        message = f"Your OTP for account verification is: {otp}"
+        send_mail(subject, message, "noreply@yourdomain.com", [email])
 
     def create_superuser(self, first_name, last_name, username, email, password=None):
         user = self.create_user(
@@ -50,7 +65,7 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=30, unique=True)
     email = models.EmailField(unique=True)
     phone_number = PhoneNumberField(blank=True, null=True, unique=True, region="IN")
-
+    
     role = models.PositiveSmallIntegerField(
         choices=USER_TYPE_CHOICES, blank=True, null=True
     )
@@ -59,15 +74,12 @@ class User(AbstractBaseUser):
     last_login = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    is_active = models.BooleanField(
-        default=True, help_text="Designates whether this user should be active."
-    )
-    is_staff = models.BooleanField(
-        default=False, help_text="Allows the user to access the admin panel."
-    )
-    is_superuser = models.BooleanField(
-        default=False, help_text="Grants all permissions to the user."
-    )
+    is_active = models.BooleanField(default=False, help_text="User needs to verify email before activation.")
+    is_staff = models.BooleanField(default=False, help_text="Allows the user to access the admin panel.")
+    is_superuser = models.BooleanField(default=False, help_text="Grants all permissions to the user.")
+
+    otp_hash = models.CharField(max_length=64, blank=True, null=True, help_text="Stores hashed OTP for email verification.")
+    otp_attempts = models.IntegerField(default=0, help_text="Count OTP attempts to prevent brute force.")
 
     objects = UserManager()
 
@@ -83,18 +95,34 @@ class User(AbstractBaseUser):
     def __str__(self):
         return self.email
 
+    def set_otp(self):
+        otp = get_random_string(length=6, allowed_chars='0123456789')
+        self.otp_hash = hashlib.sha256(otp.encode()).hexdigest()
+        self.otp_attempts = 0
+        return otp
+
+    def check_otp(self, otp):
+        if self.otp_attempts >= 5:
+            raise ValidationError("Too many failed OTP attempts. Please request a new OTP.")
+        if hashlib.sha256(otp.encode()).hexdigest() == self.otp_hash:
+            self.otp_hash = None
+            self.otp_attempts = 0
+            self.is_active = True
+            self.save()
+            return True
+        else:
+            self.otp_attempts += 1
+            self.save()
+            return False
+
+    def get_role(self):
+        return dict(self.USER_TYPE_CHOICES).get(self.role, "None")
+
     def has_perm(self, perm, obj=None):
         return self.is_superuser
 
     def has_module_perms(self, app_label):
         return True
-    
-    def get_role(self):
-        if self.role == 1:
-            return "Vendor"
-        elif self.role == 2:
-            return "Customer"
-        return "None"
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -106,7 +134,7 @@ class UserProfile(models.Model):
     state = models.CharField(max_length=100, blank=True, null=True)
     country = models.CharField(max_length=100, blank=True, null=True)
     pin_code = models.CharField(max_length=10, blank=True, null=True)
-    
+
     latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
 

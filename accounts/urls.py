@@ -9,4 +9,7 @@ urlpatterns = [
     path('customer-dashboard/', views.customerDashboard, name='customerDashboard'),
     path('vendor-dashboard/', views.vendorDashboard, name='vendorDashboard'),
     path('dashboard/', views.dashboard, name='dashboard'),
+
+    # OTP Verification Endpoint
+    path('verify-otp/', views.verify_otp, name='verify_otp_view'),
 ]
