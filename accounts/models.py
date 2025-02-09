@@ -1,3 +1,4 @@
+import base64
 import uuid
 from django.db import models
 from django.core.mail import send_mail
@@ -7,7 +8,7 @@ from django.utils.crypto import get_random_string
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
 from django.urls import reverse
-from django.conf import settings
+from foodOnline_main import settings
 
 # Custom User Manager
 class UserManager(BaseUserManager):
@@ -34,7 +35,12 @@ class UserManager(BaseUserManager):
 
     def send_verification_email(self, user):
         subject = "Email Verification"
-        verification_url = f"{settings.FRONTEND_URL}{reverse('verify-email', args=[user.verification_token])}"
+
+        # Encode user.pk in base64
+        uidb64 = base64.urlsafe_b64encode(str(user.pk).encode()).decode()
+
+        verification_url = f"{settings.FRONTEND_URL}{reverse('activate', args=[uidb64, user.verification_token])}"
+        print("Verification URL:", verification_url)
         message = f"Click the link to verify your email: {verification_url}"
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
 
@@ -76,7 +82,7 @@ class User(AbstractBaseUser):
     is_staff = models.BooleanField(default=False, help_text="Allows the user to access the admin panel.")
     is_superuser = models.BooleanField(default=False, help_text="Grants all permissions to the user.")
 
-    verification_token = models.CharField(max_length=64, unique=True, blank=True, null=True, help_text="Unique token for email verification.")
+    verification_token = models.CharField(max_length=64, unique=True, default=uuid.uuid4, help_text="Unique token for email verification.")
 
     objects = UserManager()
 
@@ -91,6 +97,13 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.email
+    
+    def generate_verification_token(self):
+        self.verification_token = str(uuid.uuid4())
+        if self.pk:  # If user already exists in database
+            self.save(update_fields=["verification_token"])
+        else:  # If new user
+            self.save()
 
     def get_role(self):
         return dict(self.USER_TYPE_CHOICES).get(self.role, "None")

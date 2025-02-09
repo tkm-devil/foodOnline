@@ -12,4 +12,5 @@ urlpatterns = [
 
     # Email Verification Endpoints
     path('activate/<uidb64>/<token>/', views.activate_account, name='activate'),
+    path('resend-verification-email/', views.resend_verification_email, name='resend_verification_email'),
 ]
