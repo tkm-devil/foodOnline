@@ -36,8 +36,11 @@ class UserRegistrationForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password"])  # Hash password before saving
-        user.is_active = False  # Set inactive until OTP verification
-        user.save()
+        user.is_active = False  # Set inactive until email verification
+        user.generate_verification_token()
+        if commit:
+            user.save()
+            user.send_verification_email()
         return user
     
 
@@ -46,9 +49,8 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
 
-class OTPVerificationForm(forms.Form):
-    otp = forms.CharField(
-        max_length=6,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter OTP'}),
-        label="OTP"
+class EmailVerificationForm(forms.Form):
+    token = forms.CharField(
+        max_length=64,
+        widget=forms.HiddenInput()
     )

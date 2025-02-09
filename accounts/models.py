@@ -1,5 +1,4 @@
-import random
-import hashlib
+import uuid
 from django.db import models
 from django.core.mail import send_mail
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
@@ -7,10 +6,11 @@ from phonenumber_field.modelfields import PhoneNumberField
 from django.utils.crypto import get_random_string
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
+from django.urls import reverse
+from django.conf import settings
 
 # Custom User Manager
 class UserManager(BaseUserManager):
-
     def create_user(self, first_name, last_name, username, email, password=None):
         if not email:
             raise ValueError("Users must have an email address")
@@ -22,20 +22,21 @@ class UserManager(BaseUserManager):
             first_name=first_name,
             last_name=last_name,
             username=username,
+            verification_token=str(uuid.uuid4()),
         )
         user.set_password(password)
-        user.set_otp()
         user.is_active = False  # Account will only be active after verification
         user.save(using=self._db)
 
-        # Send OTP Email
-        self.send_otp_email(user.email, user.otp)
+        # Send Verification Email
+        self.send_verification_email(user)
         return user
 
-    def send_otp_email(self, email, otp):
-        subject = "Email Verification Code"
-        message = f"Your OTP for account verification is: {otp}"
-        send_mail(subject, message, "noreply@yourdomain.com", [email])
+    def send_verification_email(self, user):
+        subject = "Email Verification"
+        verification_url = f"{settings.FRONTEND_URL}{reverse('verify-email', args=[user.verification_token])}"
+        message = f"Click the link to verify your email: {verification_url}"
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
 
     def create_superuser(self, first_name, last_name, username, email, password=None):
         user = self.create_user(
@@ -65,10 +66,7 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=30, unique=True)
     email = models.EmailField(unique=True)
     phone_number = PhoneNumberField(blank=True, null=True, unique=True, region="IN")
-    
-    role = models.PositiveSmallIntegerField(
-        choices=USER_TYPE_CHOICES, blank=True, null=True
-    )
+    role = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, blank=True, null=True)
 
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
@@ -78,8 +76,7 @@ class User(AbstractBaseUser):
     is_staff = models.BooleanField(default=False, help_text="Allows the user to access the admin panel.")
     is_superuser = models.BooleanField(default=False, help_text="Grants all permissions to the user.")
 
-    otp_hash = models.CharField(max_length=64, blank=True, null=True, help_text="Stores hashed OTP for email verification.")
-    otp_attempts = models.IntegerField(default=0, help_text="Count OTP attempts to prevent brute force.")
+    verification_token = models.CharField(max_length=64, unique=True, blank=True, null=True, help_text="Unique token for email verification.")
 
     objects = UserManager()
 
@@ -94,26 +91,6 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.email
-
-    def set_otp(self):
-        otp = get_random_string(length=6, allowed_chars='0123456789')
-        self.otp_hash = hashlib.sha256(otp.encode()).hexdigest()
-        self.otp_attempts = 0
-        return otp
-
-    def check_otp(self, otp):
-        if self.otp_attempts >= 5:
-            raise ValidationError("Too many failed OTP attempts. Please request a new OTP.")
-        if hashlib.sha256(otp.encode()).hexdigest() == self.otp_hash:
-            self.otp_hash = None
-            self.otp_attempts = 0
-            self.is_active = True
-            self.save()
-            return True
-        else:
-            self.otp_attempts += 1
-            self.save()
-            return False
 
     def get_role(self):
         return dict(self.USER_TYPE_CHOICES).get(self.role, "None")

@@ -10,6 +10,6 @@ urlpatterns = [
     path('vendor-dashboard/', views.vendorDashboard, name='vendorDashboard'),
     path('dashboard/', views.dashboard, name='dashboard'),
 
-    # OTP Verification Endpoint
-    path('verify-otp/', views.verify_otp, name='verify_otp_view'),
+    # Email Verification Endpoints
+    path('activate/<uidb64>/<token>/', views.activate_account, name='activate'),
 ]
