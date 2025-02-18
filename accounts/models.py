@@ -82,7 +82,7 @@ class User(AbstractBaseUser):
     is_staff = models.BooleanField(default=False, help_text="Allows the user to access the admin panel.")
     is_superuser = models.BooleanField(default=False, help_text="Grants all permissions to the user.")
 
-    verification_token = models.CharField(max_length=64, unique=True, default=uuid.uuid4, help_text="Unique token for email verification.")
+    verification_token = models.CharField(null=True, max_length=64, unique=True, default=uuid.uuid4, help_text="Unique token for email verification.")
 
     objects = UserManager()
 

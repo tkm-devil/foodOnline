@@ -86,6 +86,7 @@ DATABASES = {
         'USER': config('DATABASE_USER'),
         'PASSWORD': config('DATABASE_PASSWORD'),
         'HOST': config('DATABASE_HOST'),
+        'PORT': config('DATABASE_PORT'),
     }
 }
 
@@ -149,19 +150,9 @@ EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 
 # Frontend URL (Update this based on your actual frontend deployment)
-FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:3000")
+FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:8000")
 
 # Default sender email
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default=EMAIL_HOST_USER)
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Allow your frontend during development
-    "https://yourdomain.com",  # Add live frontend URL here
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
-    "https://yourdomain.com",
-]
 
 CORS_ALLOW_ALL_ORIGINS = True

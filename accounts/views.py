@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect, render, HttpResponse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -15,6 +15,9 @@ from .models import User, UserProfile
 from .tokens import email_verification_token
 from vendor.forms import VendorRegistrationForm
 from foodOnline_main import settings
+
+def randomview(request):
+    return HttpResponse("Working")
 
 def send_verification_email(request, user):
     current_site = get_current_site(request)
@@ -100,21 +103,20 @@ def registerVendor(request):
     return render(request, 'accounts/registerVendor.html', {'form': form, 'vendor_form': vendor_form})
 
 def activate_account(request, uidb64, token):
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
+    # Get user directly using the token
+    print("TOKEN: ", token)
+    user = User.objects.filter(verification_token=token).first()
 
-    if user and email_verification_token.check_token(user, token):
-        if not user.is_active:  # Only activate if the user is inactive
-            user.is_active = True
-            user.verification_token = None  # Clear the token after verification
-            user.save()
+    if user:
+        if not user.is_active:
+            # Update user fields directly in the database
+            User.objects.filter(id=user.id).update(
+                is_active=True,
+                verification_token=token  # Keep the token instead of setting to None
+            )
             messages.success(request, "Your account has been activated! You can now log in.")
         else:
             messages.info(request, "Your account is already active.")
-
         return redirect("login_view")
     else:
         messages.error(request, "Invalid activation link or expired token.")
