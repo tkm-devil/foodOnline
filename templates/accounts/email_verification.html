@@ -1,43 +1,11 @@
-{% extends 'base.html' %}
-
-{% block content %}
-
-<!-- Main Section Start -->
-<style>
-    .btn-primary {
-        color: #fff;
-        background-color: #c33332;
-        border-color: #c33332;
-    }
-</style>
-<div class="main-section">
-    <div class="page-section nopadding cs-nomargin" style="margin-top: 0px; padding-top: 60px; padding-bottom: 60px; margin-bottom: 0px;">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-6 col-md-8 col-sm-10 col-xs-12">
-                    <div class="user-dashboard loader-holder shadow p-4 rounded bg-white" style="width: 450px; min-height: auto;">
-                        <div class="user-holder text-center">
-                            <h4 class="mb-3 font-weight-bold">VERIFY YOUR EMAIL</h4>
-                            <p>We've sent an email to your registered address. Please check your inbox and click the verification link to activate your account.</p>
-                            <hr>
-
-                            <!-- Display Django Messages -->
-                            {% include 'includes/alerts.html' %}
-
-                            <div class="form-group text-center">
-                                <a href="{% url 'resend_verification_email' %}" class="btn btn-primary btn-lg btn-block">
-                                    Resend Verification Email
-                                </a>
-                            </div>
-
-                            <p class="text-center">Already verified? <a href="{% url 'login_view' %}" class="font-weight-bold">Login here</a></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Main Section End -->
-
-{% endblock %}
+<html>
+<body>
+    <p>Hi {{ user.first_name }},</p>
+    <p>Click the link below to verify your email and activate your account:</p>
+    <p>
+        <a href="{{ verification_url }}" target="_blank">{{ verification_url }}</a>
+    </p>
+    <p>If you did not sign up for this account, please ignore this email.</p>
+    <p>Thanks,<br>Your Website Team</p>
+</body>
+</html>

@@ -22,13 +22,15 @@ def send_verification_email(request, user):
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     token = email_verification_token.make_token(user)
     verification_url = f"{settings.FRONTEND_URL}/activate/{uid}/{token}/"
+
+    # Use a simple email template (not a full webpage)
     message = render_to_string('accounts/email_verification.html', {
         'user': user,
         'domain': current_site.domain,
-        'uid': uid,
-        'token': token,
+        'verification_url': verification_url,  # Use this instead of including UID and token separately
     })
-    send_mail(mail_subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+
+    send_mail(mail_subject, "", settings.DEFAULT_FROM_EMAIL, [user.email], html_message=message)
 
 def resend_verification_email(request):
     if request.user.is_authenticated:
@@ -56,6 +58,7 @@ def registerUser(request):
             user = form.save(commit=False)
             user.role = User.CUSTOMER
             user.is_active = False
+            user.save()
             user.generate_verification_token()  # This will now work correctly
             
             send_verification_email(request, user)
@@ -104,10 +107,14 @@ def activate_account(request, uidb64, token):
         user = None
 
     if user and email_verification_token.check_token(user, token):
-        user.is_active = True
-        user.verification_token = None  # Clear the token after verification
-        user.save()
-        messages.success(request, "Your account has been activated! You can now log in.")
+        if not user.is_active:  # Only activate if the user is inactive
+            user.is_active = True
+            user.verification_token = None  # Clear the token after verification
+            user.save()
+            messages.success(request, "Your account has been activated! You can now log in.")
+        else:
+            messages.info(request, "Your account is already active.")
+
         return redirect("login_view")
     else:
         messages.error(request, "Invalid activation link or expired token.")
