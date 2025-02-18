@@ -40,9 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'vendor',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -150,3 +153,15 @@ FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:3000")
 
 # Default sender email
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default=EMAIL_HOST_USER)
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Allow your frontend during development
+    "https://yourdomain.com",  # Add live frontend URL here
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "https://yourdomain.com",
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
