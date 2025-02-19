@@ -16,21 +16,17 @@ from .tokens import email_verification_token
 from vendor.forms import VendorRegistrationForm
 from foodOnline_main import settings
 
-def randomview(request):
-    return HttpResponse("Working")
-
 def send_verification_email(request, user):
     current_site = get_current_site(request)
     mail_subject = 'Activate your account'
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     token = email_verification_token.make_token(user)
-    verification_url = f"{settings.FRONTEND_URL}/activate/{uid}/{token}/"
+    
+    verification_url = f"http://{current_site.domain}/accounts/activate/{uid}/{token}/"  # Use Django backend
 
-    # Use a simple email template (not a full webpage)
     message = render_to_string('accounts/email_verification.html', {
         'user': user,
-        'domain': current_site.domain,
-        'verification_url': verification_url,  # Use this instead of including UID and token separately
+        'verification_url': verification_url,
     })
 
     send_mail(mail_subject, "", settings.DEFAULT_FROM_EMAIL, [user.email], html_message=message)
@@ -103,17 +99,16 @@ def registerVendor(request):
     return render(request, 'accounts/registerVendor.html', {'form': form, 'vendor_form': vendor_form})
 
 def activate_account(request, uidb64, token):
-    # Get user directly using the token
-    print("TOKEN: ", token)
-    user = User.objects.filter(verification_token=token).first()
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
 
-    if user:
+    if user is not None and email_verification_token.check_token(user, token):
         if not user.is_active:
-            # Update user fields directly in the database
-            User.objects.filter(id=user.id).update(
-                is_active=True,
-                verification_token=token  # Keep the token instead of setting to None
-            )
+            user.is_active = True
+            user.save()
             messages.success(request, "Your account has been activated! You can now log in.")
         else:
             messages.info(request, "Your account is already active.")

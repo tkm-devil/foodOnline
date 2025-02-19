@@ -1,11 +1,13 @@
 <html>
-<body>
+  <body>
     <p>Hi {{ user.first_name }},</p>
     <p>Click the link below to verify your email and activate your account:</p>
     <p>
-        <a href="{{ verification_url }}" target="_blank">{{ verification_url }}</a>
+      <a href="{{ verification_url }}" target="_blank"
+        >{{ verification_url }}</a
+      >
     </p>
     <p>If you did not sign up for this account, please ignore this email.</p>
-    <p>Thanks,<br>Your Website Team</p>
-</body>
+    <p>Thanks,<br />Your Website Team</p>
+  </body>
 </html>

@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
@@ -10,8 +11,13 @@ urlpatterns = [
     path('vendor-dashboard/', views.vendorDashboard, name='vendorDashboard'),
     path('dashboard/', views.dashboard, name='dashboard'),
 
-    # Email Verification Endpoints
-    # path('neokaurl', views.randomview, name="randomView"),
+    # Email Verification
     path('activate/<uidb64>/<token>/', views.activate_account, name='activate'),
     path('resend-verification-email/', views.resend_verification_email, name='resend_verification_email'),
+
+    # Password Reset
+    path('password-reset/', auth_views.PasswordResetView.as_view(template_name='accounts/password_reset.html'), name='password_reset'),
+    path('password-reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='accounts/password_reset_done.html'), name='password_reset_done'),
+    path('password-reset-confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='accounts/password_reset_confirm.html'), name='password_reset_confirm'),
+    path('password-reset-complete/', auth_views.PasswordResetCompleteView.as_view(template_name='accounts/password_reset_complete.html'), name='password_reset_complete'),
 ]
