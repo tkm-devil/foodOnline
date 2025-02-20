@@ -1,5 +1,175 @@
-{% extends "base.html" %}
-{% block content %}
-  <h2>Welcome, Vendor!</h2>
-  <p>This is your vendor dashboard where you can manage your store, view sales, and more.</p>
+{% extends "base.html" %} {% block content %} {% load static %}
+
+<!-- Main Section Start -->
+<div class="main-section">
+  <style>
+    .restaurant-detail-image-section {
+      background: url("{% static 'assets/extra-images/cover-photo01.jpg' %}")
+        no-repeat center center / cover;
+    }
+  </style>
+  <div class="page-section restaurant-detail-image-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="company-info-detail">
+            <div class="company-info">
+              <div class="img-holder">
+                <figure>
+                  <img
+                    src="{% static 'assets/extra-images/listing-logo18.png' %}"
+                    alt="Vendor Logo"
+                  />
+                </figure>
+              </div>
+              <div class="text-holder">
+                <span class="restaurant-title">{{ vendor.vendor_name }}</span>
+                <div class="text">
+                  <i class="icon-location"></i>
+                  <p>
+                    {% if vendor.user_profile %} {{ vendor.user_profile.address
+                    }} {% else %} Address not available {% endif %}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-section account-header buyer-logged-in">
+    <div class="container">
+      <div class="row">
+        <!-- Sidebar Navigation -->
+        <div class="col-lg-3 col-md-3 col-sm-12">
+          <div class="user-account-nav user-account-sidebar">
+            <div class="user-nav-list">
+              <ul>
+                <li class="active">
+                  <a href="{% url 'vendorDashboard' %}"
+                    ><i class="icon-dashboard3"></i>Dashboard</a
+                  >
+                </li>
+                <li>
+                  <a href="{% url 'vendor_profile' %}"
+                    ><i class="icon-building"></i>My Restaurant</a
+                  >
+                </li>
+                <li>
+                  <a href="{% url 'menu_builder' %}"
+                    ><i class="icon-menu5"></i>Menu Builder</a
+                  >
+                </li>
+                <li>
+                  <a href="{% url 'vendor_orders' %}"
+                    ><i class="icon-add_shopping_cart"></i>Orders</a
+                  >
+                </li>
+                <li>
+                  <a href="{% url 'vendor_earnings' %}"
+                    ><i class="icon-money"></i>Earnings</a
+                  >
+                </li>
+                <li>
+                  <a href="{% url 'vendor_statements' %}"
+                    ><i class="icon-file-text22"></i>Statement</a
+                  >
+                </li>
+                <li>
+                  <a href="{% url 'change_password' %}"
+                    ><i class="icon-unlock-alt"></i>Change Password</a
+                  >
+                </li>
+                <li>
+                  <a class="logout-btn" href="{% url 'logout_view' %}"
+                    ><i class="icon-log-out"></i>Signout</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- Dashboard Content -->
+        <div class="col-lg-9 col-md-9 col-sm-12">
+          <div class="user-dashboard loader-holder">
+            <div class="user-holder">
+              <div class="col-lg-12">
+                <div class="row">
+                  <div class="element-title has-border right-filters-row">
+                    <h5>Recent Orders</h5>
+                    <div class="right-filters row pull-right">
+                      <div class="col-lg-6">
+                        <div class="input-field">
+                          <select class="chosen-select-no-single">
+                            <option selected="selected" value="">
+                              Select Order Status
+                            </option>
+                            <option value="Processing">Processing</option>
+                            <option value="Cancelled">Cancelled</option>
+                            <option value="Completed">Completed</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="user-orders-list">
+                    <div class="responsive-table">
+                      <ul class="table-generic">
+                        <li class="order-heading-titles">
+                          <div>Order ID</div>
+                          <div>Date</div>
+                          <div>Total Price</div>
+                          <div>Charges</div>
+                          <div>Received</div>
+                          <div>Status</div>
+                        </li>
+                        {% if orders %} {% for order in orders %}
+                        <li class="order-details">
+                          <div>
+                            <a
+                              href="#"
+                              data-toggle="modal"
+                              data-target="#order-det-{{ order.id }}"
+                              >{{ order.id }}</a
+                            >
+                          </div>
+                          <div>{{ order.date }}</div>
+                          <div>₹ {{ order.total_price }}</div>
+                          <div>₹ {{ order.charges }}</div>
+                          <div>₹ {{ order.received }}</div>
+                          <div>
+                            {% with order.status as status %} {% if status ==
+                            "Completed" %} {% set bg_color = "#047a06" %} {%
+                            elif status == "Processing" %} {% set bg_color =
+                            "#1e73be" %} {% else %} {% set bg_color = "#d9534f"
+                            %} {% endif %} {% endwith %}
+
+                            <span class="order-status"style="background-color: {{ bg_color }};"
+                            >
+                              {{ order.status }}
+                            </span>
+                          </div>
+                        </li>
+                        {% endfor %} {% else %}
+                        <li>No orders found.</li>
+                        {% endif %}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Main Section End -->
+
 {% endblock %}
