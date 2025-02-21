@@ -1,5 +1,155 @@
 {% extends "base.html" %}
 {% block content %}
-  <h2>Welcome, Customer!</h2>
-  <p>This is your customer dashboard where you can manage orders, view products, and more.</p>
+{% load static %}
+
+<!-- Main Section Start -->
+<div class="main-section">
+    <style>
+        .customer-detail-image-section {
+            background: url("{% static 'extra-images/cover-photo01.jpg' %}") no-repeat center center / cover;
+        }
+        .order-status.completed {
+            background-color: #047a06;
+        }
+        .order-status.processing {
+            background-color: #1e73be;
+        }
+        .order-status.default {
+            background-color: #d9534f;
+        }
+    </style>
+
+    <div class="page-section customer-detail-image-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="user-info-detail">
+                        <div class="user-info">
+                            <div class="img-holder">
+                                <figure>
+                                    <img src="{% static 'extra-images/user-profile.png' %}" alt="User Profile">
+                                </figure>
+                            </div>
+                            <div class="text-holder">
+                                <span class="customer-name">{{ user.get_full_name }}</span>
+                                <div class="text">
+                                    <i class="icon-location"></i>
+                                    <p>
+                                        {% if user.profile %}
+                                            {{ user.profile.address }}
+                                        {% else %}
+                                            Address not available
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-section account-header buyer-logged-in">
+        <div class="container">
+            <div class="row">
+                <!-- Sidebar Navigation -->
+                {% include 'includes/customer_sidebar.html' %}
+
+                <!-- Dashboard Content -->
+                <div class="col-lg-9 col-md-9 col-sm-12">
+                    <div class="user-dashboard loader-holder">
+                        <div class="user-holder">
+                            <div class="col-lg-12">
+                                <div class="row">
+                                    <div class="element-title has-border right-filters-row">
+                                        <h5>My Orders</h5>
+                                        <div class="right-filters row pull-right">
+                                            <div class="col-lg-6">
+                                                <div class="input-field">
+                                                    <select class="chosen-select-no-single">
+                                                        <option selected="selected" value="">Filter Orders</option>
+                                                        <option value="Recent">Recent Orders</option>
+                                                        <option value="Processing">In Progress</option>
+                                                        <option value="Completed">Completed</option>
+                                                        <option value="Cancelled">Cancelled</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="user-orders-list">
+                                        <div class="responsive-table">
+                                            <ul class="table-generic">
+                                                <li class="order-heading-titles">
+                                                    <div>Order ID</div>
+                                                    <div>Restaurant</div>
+                                                    <div>Date</div>
+                                                    <div>Total</div>
+                                                    <div>Status</div>
+                                                    <div>Action</div>
+                                                </li>
+
+                                                {% if orders %}
+                                                    {% for order in orders %}
+                                                        <li>
+                                                            <div>#{{ order.order_number }}</div>
+                                                            <div>{{ order.vendor.vendor_name }}</div>
+                                                            <div>{{ order.created_at|date:"d M Y" }}</div>
+                                                            <div>${{ order.total }}</div>
+                                                            <div>
+                                                                <span class="order-status {% if order.status == 'Completed' %}completed{% elif order.status == 'Processing' %}processing{% else %}default{% endif %}">
+                                                                    {{ order.status }}
+                                                                </span>
+                                                            </div>
+                                                            <div>
+                                                                <a href="{% url 'order_detail' order.order_number %}" class="btn btn-info">View Details</a>
+                                                            </div>
+                                                        </li>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <li class="text-center">No orders found.</li>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recent Restaurants Section -->
+                            <div class="row mt-5">
+                                <div class="col-lg-12">
+                                    <div class="element-title has-border">
+                                        <h5>Recently Visited Restaurants</h5>
+                                    </div>
+                                    <div class="restaurant-grid">
+                                        {% if recent_restaurants %}
+                                            {% for restaurant in recent_restaurants %}
+                                                <div class="col-lg-4 col-md-6">
+                                                    <div class="restaurant-card">
+                                                        <img src="{{ restaurant.image.url }}" alt="{{ restaurant.name }}">
+                                                        <h6>{{ restaurant.name }}</h6>
+                                                        <p>{{ restaurant.cuisine_type }}</p>
+                                                        <a href="{% url 'restaurant_detail' restaurant.id %}" class="btn btn-outline-primary">View Menu</a>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-center">No recently visited restaurants.</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

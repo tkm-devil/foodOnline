@@ -1,0 +1,48 @@
+<div class="col-lg-3 col-md-3 col-sm-12">
+    <div class="user-account-nav user-account-sidebar">
+        <div class="user-nav-list">
+            <ul>
+                <li class="{% if request.resolver_match.url_name == 'customerDashboard' %}active{% endif %}">
+                    <a href="{% url 'customerDashboard' %}">
+                        <i class="icon-dashboard3"></i>Dashboard
+                    </a>
+                </li>
+                <li class="{% if request.resolver_match.url_name == 'customer_profile' %}active{% endif %}">
+                    <a href="{% url 'customer_profile' %}">
+                        <i class="icon-user"></i>My Profile
+                    </a>
+                </li>
+                <li class="{% if request.resolver_match.url_name == 'my_orders' %}active{% endif %}">
+                    <a href="{% url 'my_orders' %}">
+                        <i class="icon-shopping-cart"></i>My Orders
+                    </a>
+                </li>
+                <li class="{% if request.resolver_match.url_name == 'favorite_restaurants' %}active{% endif %}">
+                    <a href="{% url 'favorite_restaurants' %}">
+                        <i class="icon-heart"></i>Favorite Restaurants
+                    </a>
+                </li>
+                <li class="{% if request.resolver_match.url_name == 'my_addresses' %}active{% endif %}">
+                    <a href="{% url 'my_addresses' %}">
+                        <i class="icon-location"></i>Manage Addresses
+                    </a>
+                </li>
+                <li class="{% if request.resolver_match.url_name == 'order_history' %}active{% endif %}">
+                    <a href="{% url 'order_history' %}">
+                        <i class="icon-file-text22"></i>Order History
+                    </a>
+                </li>
+                <li class="{% if request.resolver_match.url_name == 'change_password' %}active{% endif %}">
+                    <a href="{% url 'change_password' %}">
+                        <i class="icon-unlock-alt"></i>Change Password
+                    </a>
+                </li>
+                <li>
+                    <a class="logout-btn" href="{% url 'logout_view' %}">
+                        <i class="icon-log-out"></i>Signout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
