@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Order Details - #{{ order.id }}</h2>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">Customer: {{ order.customer.username }}</h5>
+            <p>Email: {{ order.customer.email }}</p>
+            <p>Total Price: ₹{{ order.total_price }}</p>
+            <p>Status: <span class="badge {% if order.status == 'Completed' %}bg-success{% elif order.status == 'Cancelled' %}bg-danger{% else %}bg-warning{% endif %}">{{ order.status }}</span></p>
+        </div>
+    </div>
+
+    <h4 class="mt-4">Ordered Items</h4>
+    <ul class="list-group">
+        {% for item in order.items.all %}
+        <li class="list-group-item">
+            {{ item.menu_item.name }} - ₹{{ item.price }} x {{ item.quantity }}
+        </li>
+        {% empty %}
+        <li class="list-group-item text-center">No items found.</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'vendor_orders' %}" class="btn btn-secondary mt-3">Back to Orders</a>
+</div>
+{% endblock %}

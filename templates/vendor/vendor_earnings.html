@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Vendor Earnings</h2>
+
+    <div class="card p-4">
+        <h4>Total Earnings: ₹{{ earnings.total_earnings }}</h4>
+        <h5>Last Payment: ₹{{ earnings.last_payment }}</h5>
+        <h6>Last Payment Date: {{ earnings.last_payment_date|default:"N/A" }}</h6>
+    </div>
+</div>
+{% endblock %}

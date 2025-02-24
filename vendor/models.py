@@ -52,3 +52,61 @@ class Vendor(models.Model):
             [self.user.email],
             fail_silently=False,
         )
+
+class MenuItem(models.Model):
+    vendor = models.ForeignKey(Vendor, related_name="menu_items", on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    image = models.ImageField(upload_to="vendor/menu_items/", blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'menu_item'
+        verbose_name = 'Menu Item'
+        verbose_name_plural = 'Menu Items'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.name
+    
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ('Processing', 'Processing'),
+        ('Completed', 'Completed'),
+        ('Cancelled', 'Cancelled'),
+    ]
+
+    vendor = models.ForeignKey(Vendor, related_name="orders", on_delete=models.CASCADE)
+    customer = models.ForeignKey(User, related_name="orders", on_delete=models.CASCADE)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    charges = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
+    received = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Processing')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'order'
+        verbose_name = 'Order'
+        verbose_name_plural = 'Orders'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Order {self.id} - {self.vendor.vendor_name} - {self.status}"
+    
+class Earnings(models.Model):
+    vendor = models.OneToOneField(Vendor, related_name="earnings", on_delete=models.CASCADE)
+    total_earnings = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    last_payment = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    last_payment_date = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'earnings'
+        verbose_name = 'Earnings'
+        verbose_name_plural = 'Earnings'
+
+    def __str__(self):
+        return f"Earnings for {self.vendor.vendor_name}: {self.total_earnings}"
