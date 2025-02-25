@@ -165,4 +165,6 @@ def vendorDashboard(request):
     if request.user.role != User.VENDOR:
         messages.error(request, "Unauthorized access! You are not a vendor.")
         return redirect("home")
-    return render(request, "accounts/vendorDashboard.html")
+    
+    vendor = request.user.vendor
+    return render(request, "accounts/vendorDashboard.html", {"vendor": vendor})

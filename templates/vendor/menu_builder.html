@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
+
+<!-- Include the cover section -->
+{% include 'includes/vendor_cover.html' %}
+
 <div class="container mt-5">
     <h2 class="mb-4">Menu Builder</h2>
     <a href="{% url 'add_menu_item' %}" class="btn btn-success mb-3">Add New Menu Item</a>

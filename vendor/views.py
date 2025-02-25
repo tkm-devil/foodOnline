@@ -4,24 +4,36 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.db.models import Sum, Max
+from accounts.forms import UserProfileForm
 from .forms import VendorRegistrationForm, MenuItemForm
 from .models import Order, MenuItem, Earnings
 
 @login_required
 def vendor_profile(request):
+    user = request.user
+    vendor = user.vendor
+    profile = vendor.user_profile  # Get the associated UserProfile
+
     if request.method == "POST":
-        form = VendorRegistrationForm(request.POST, request.FILES, instance=request.user.vendor)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Profile updated successfully")
+        vendor_form = VendorRegistrationForm(request.POST, request.FILES, instance=vendor)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
+
+        if vendor_form.is_valid() and profile_form.is_valid():
+            vendor_form.save()
+            profile_form.save()
+            messages.success(request, "Profile updated successfully.")
             return redirect("vendor_profile")
         else:
-            messages.error(request, "Please correct the error below.")
+            messages.error(request, "Please correct the errors below.")
     else:
-        form = VendorRegistrationForm(instance=request.user.vendor)
-    
-    context = {"form": form}
-    return render(request, "vendor/vendor_profile.html", context)
+        vendor_form = VendorRegistrationForm(instance=vendor)
+        profile_form = UserProfileForm(instance=profile)
+
+    return render(
+        request,
+        "vendor/vendor_profile.html",
+        {"vendor_form": vendor_form, "profile_form": profile_form},
+    )
 
 @login_required
 def menu_builder(request):

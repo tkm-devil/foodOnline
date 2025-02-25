@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
-from .models import User
+from .models import User, UserProfile
 
 class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(
@@ -53,3 +53,17 @@ class EmailVerificationForm(forms.Form):
         max_length=64,
         widget=forms.HiddenInput()
     )
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['profile_picture', 'cover_picture', 'address_line_1', 'city', 'state', 'country', 'pin_code']
+        widgets = {
+            'profile_picture': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'cover_picture': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'address_line_1': forms.TextInput(attrs={'class': 'form-control'}),
+            'city': forms.TextInput(attrs={'class': 'form-control'}),
+            'state': forms.TextInput(attrs={'class': 'form-control'}),
+            'country': forms.TextInput(attrs={'class': 'form-control'}),
+            'pin_code': forms.TextInput(attrs={'class': 'form-control'}),
+        }

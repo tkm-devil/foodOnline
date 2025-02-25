@@ -1,0 +1,40 @@
+{% load static %}
+
+<style>
+    .restaurant-detail-image-section {
+        background: url("{% if vendor.user_profile.cover_photo %}{{ vendor.user_profile.cover_photo.url }}{% else %}{% static 'extra-images/cover-photo01.jpg' %}{% endif %}") 
+        no-repeat center center / cover;
+    }
+</style>
+
+<div class="page-section restaurant-detail-image-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="company-info-detail">
+                    <div class="company-info">
+                        <div class="img-holder">
+                            <figure>
+                                <img src="{% if vendor.user_profile.profile_photo %}{{ vendor.user_profile.profile_photo.url }}{% else %}{% static 'extra-images/listing-logo18.png' %}{% endif %}" 
+                                     alt="{{ vendor.vendor_name }} Logo">
+                            </figure>
+                        </div>
+                        <div class="text-holder">
+                            <span class="restaurant-title">{{ vendor.vendor_name }}</span>
+                            <div class="text">
+                                <i class="icon-location"></i>
+                                <p>
+                                    {% if vendor.user_profile.address %}
+                                        {{ vendor.user_profile.address }}
+                                    {% else %}
+                                        Address not available
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

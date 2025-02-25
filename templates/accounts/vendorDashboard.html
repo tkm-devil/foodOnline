@@ -2,78 +2,32 @@
 {% block content %}
 {% load static %}
 
-<!-- Main Section Start -->
-<div class="main-section">
-    <style>
-        .restaurant-detail-image-section {
-            background: url("{% static 'extra-images/cover-photo01.jpg' %}") no-repeat center center / cover;
-        }
-        .order-status.completed {
-            background-color: #047a06;
-        }
-        .order-status.processing {
-            background-color: #1e73be;
-        }
-        .order-status.default {
-            background-color: #d9534f;
-        }
-    </style>
+<!-- Include the cover section -->
+{% include 'includes/vendor_cover.html' %}
 
-    <div class="page-section restaurant-detail-image-section">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="company-info-detail">
-                        <div class="company-info">
-                            <div class="img-holder">
-                                <figure>
-                                    <img src="{% static 'extra-images/listing-logo18.png' %}" alt="Vendor Logo">
-                                </figure>
-                            </div>
-                            <div class="text-holder">
-                                <span class="restaurant-title">{{ vendor.vendor_name }}</span>
-                                <div class="text">
-                                    <i class="icon-location"></i>
-                                    <p>
-                                        {% if vendor.user_profile %}
-                                            {{ vendor.user_profile.address }}
-                                        {% else %}
-                                            Address not available
-                                        {% endif %}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="page-section account-header buyer-logged-in">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar Navigation -->
+            {% include 'includes/vendor_sidebar.html' %}
 
-    <div class="page-section account-header buyer-logged-in">
-        <div class="container">
-            <div class="row">
-                <!-- Sidebar Navigation -->
-                {% include 'includes/vendor_sidebar.html' %}
-
-                <!-- Dashboard Content -->
-                <div class="col-lg-9 col-md-9 col-sm-12">
-                    <div class="user-dashboard loader-holder">
-                        <div class="user-holder">
-                            <div class="col-lg-12">
-                                <div class="row">
-                                    <div class="element-title has-border right-filters-row">
-                                        <h5>Recent Orders</h5>
-                                        <div class="right-filters row pull-right">
-                                            <div class="col-lg-6">
-                                                <div class="input-field">
-                                                    <select class="chosen-select-no-single">
-                                                        <option selected="selected" value="">Select Order Status</option>
-                                                        <option value="Processing">Processing</option>
-                                                        <option value="Cancelled">Cancelled</option>
-                                                        <option value="Completed">Completed</option>
-                                                    </select>
-                                                </div>
+            <!-- Dashboard Content -->
+            <div class="col-lg-9 col-md-9 col-sm-12">
+                <div class="user-dashboard loader-holder">
+                    <div class="user-holder">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="element-title has-border right-filters-row">
+                                    <h5>Recent Orders</h5>
+                                    <div class="right-filters row pull-right">
+                                        <div class="col-lg-6">
+                                            <div class="input-field">
+                                                <select class="chosen-select-no-single">
+                                                    <option selected="selected" value="">Select Order Status</option>
+                                                    <option value="Processing">Processing</option>
+                                                    <option value="Cancelled">Cancelled</option>
+                                                    <option value="Completed">Completed</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
