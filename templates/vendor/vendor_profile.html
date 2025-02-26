@@ -4,6 +4,12 @@
 {% block content %}
 {% include 'includes/vendor_cover.html' %}
 
+<div class="back-to-dashboard">
+    <a href="{% url 'vendorDashboard' %}" class="btn btn-primary">
+        <i class="icon-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
 <div class="container">
     <h2>Vendor Profile</h2>
     

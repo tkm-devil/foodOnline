@@ -4,6 +4,12 @@
 <!-- Include the cover section -->
 {% include 'includes/vendor_cover.html' %}
 
+<div class="back-to-dashboard">
+    <a href="{% url 'vendor_orders' %}" class="btn btn-primary">
+        <i class="icon-arrow-left"></i> Back to Orders
+    </a>
+</div>
+
 <div class="container mt-5">
     <h2>Order Details - #{{ order.id }}</h2>
 

@@ -2,7 +2,7 @@
 
 <style>
     .restaurant-detail-image-section {
-        background: url("{% if vendor.user_profile.cover_photo %}{{ vendor.user_profile.cover_photo.url }}{% else %}{% static 'extra-images/cover-photo01.jpg' %}{% endif %}") 
+        background: url("{% if vendor.user_profile.cover_picture %}{{ vendor.user_profile.cover_picture.url }}{% else %}{% static 'extra-images/cover-photo01.jpg' %}{% endif %}") 
         no-repeat center center / cover;
     }
 </style>
@@ -15,7 +15,7 @@
                     <div class="company-info">
                         <div class="img-holder">
                             <figure>
-                                <img src="{% if vendor.user_profile.profile_photo %}{{ vendor.user_profile.profile_photo.url }}{% else %}{% static 'extra-images/listing-logo18.png' %}{% endif %}" 
+                                <img src="{% if vendor.user_profile.profile_picture %}{{ vendor.user_profile.profile_picture.url }}{% else %}{% static 'extra-images/listing-logo18.png' %}{% endif %}" 
                                      alt="{{ vendor.vendor_name }} Logo">
                             </figure>
                         </div>
@@ -24,8 +24,8 @@
                             <div class="text">
                                 <i class="icon-location"></i>
                                 <p>
-                                    {% if vendor.user_profile.address %}
-                                        {{ vendor.user_profile.address }}
+                                    {% if vendor.user_profile.address_line_1 %}
+                                        {{ vendor.user_profile.address_line_1 }}
                                     {% else %}
                                         Address not available
                                     {% endif %}

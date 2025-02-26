@@ -4,6 +4,12 @@
 <!-- Include the cover section -->
 {% include 'includes/vendor_cover.html' %}
 
+<div class="back-to-dashboard">
+    <a href="{% url 'vendorDashboard' %}" class="btn btn-primary">
+        <i class="icon-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
 <div class="container mt-5">
     <h2 class="mb-4">Vendor Statements</h2>
 

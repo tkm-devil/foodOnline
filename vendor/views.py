@@ -32,21 +32,23 @@ def vendor_profile(request):
     return render(
         request,
         "vendor/vendor_profile.html",
-        {"vendor_form": vendor_form, "profile_form": profile_form},
+        {"vendor_form": vendor_form, "profile_form": profile_form, "vendor": vendor},
     )
 
 @login_required
 def menu_builder(request):
-    menu_items = MenuItem.objects.filter(vendor=request.user.vendor)  # Fetch vendor's menu items
-    return render(request, "vendor/menu_builder.html", {"menu_items": menu_items})
+    vendor = request.user.vendor
+    menu_items = MenuItem.objects.filter(vendor=vendor)  # Fetch vendor's menu items
+    return render(request, "vendor/menu_builder.html", {"menu_items": menu_items, "vendor": vendor})
 
 @login_required
 def add_menu_item(request):
+    vendor = request.user.vendor
     if request.method == "POST":
         form = MenuItemForm(request.POST, request.FILES)
         if form.is_valid():
             menu_item = form.save(commit=False)
-            menu_item.vendor = request.user.vendor
+            menu_item.vendor = vendor
             menu_item.save()
             messages.success(request, "Menu item added successfully!")
             return redirect("menu_builder")
@@ -55,11 +57,12 @@ def add_menu_item(request):
     else:
         form = MenuItemForm()
     
-    return render(request, "vendor/menu_item_form.html", {"form": form})
+    return render(request, "vendor/menu_item_form.html", {"form": form, "vendor": vendor})
 
 @login_required
 def edit_menu_item(request, item_id):
-    menu_item = get_object_or_404(MenuItem, id=item_id, vendor=request.user.vendor)
+    vendor = request.user.vendor
+    menu_item = get_object_or_404(MenuItem, id=item_id, vendor=vendor)
     
     if request.method == "POST":
         form = MenuItemForm(request.POST, request.FILES, instance=menu_item)
@@ -72,7 +75,7 @@ def edit_menu_item(request, item_id):
     else:
         form = MenuItemForm(instance=menu_item)
 
-    return render(request, "vendor/menu_item_form.html", {"form": form})
+    return render(request, "vendor/menu_item_form.html", {"form": form, "vendor": vendor})
 
 @login_required
 def delete_menu_item(request, item_id):
@@ -84,14 +87,16 @@ def delete_menu_item(request, item_id):
 @login_required
 def vendor_orders(request):
     """Display all orders for the vendor, sorted by latest."""
-    orders = Order.objects.filter(vendor=request.user.vendor).select_related('customer').order_by('-created_at')
-    return render(request, "vendor/vendor_orders.html", {"orders": orders})
+    vendor = request.user.vendor
+    orders = Order.objects.filter(vendor=vendor).select_related('customer').order_by('-created_at')
+    return render(request, "vendor/vendor_orders.html", {"orders": orders, "vendor": vendor})
 
 @login_required
 def order_details(request, order_id):
     """View detailed order information."""
-    order = get_object_or_404(Order, id=order_id, vendor=request.user.vendor)
-    return render(request, "vendor/order_details.html", {"order": order})
+    vendor = request.user.vendor
+    order = get_object_or_404(Order, id=order_id, vendor=vendor)
+    return render(request, "vendor/order_details.html", {"order": order, "vendor": vendor})
 
 @login_required
 def update_order_status(request, order_id, new_status):
@@ -117,6 +122,7 @@ def vendor_earnings(request):
     )
 
     context = {
+        "vendor": vendor,
         "total_earnings": earnings["total_earnings"],
         "last_payment": earnings["last_payment"],
         "last_payment_date": earnings["last_payment_date"],
@@ -129,7 +135,7 @@ def vendor_statements(request):
     vendor = request.user.vendor
     orders = Order.objects.filter(vendor=vendor).order_by('-created_at')  # Latest orders first
 
-    context = {"orders": orders}
+    context = {"orders": orders, "vendor": vendor}
     return render(request, "vendor/vendor_statements.html", context)
 
 @login_required
