@@ -17,22 +17,49 @@
         <div class="card-body">
             <h5 class="card-title">Customer: {{ order.customer.username }}</h5>
             <p>Email: {{ order.customer.email }}</p>
+            <p>Phone: {{ order.customer.profile.phone_number }}</p> <!-- If phone number exists in profile -->
+            <p>Address: {{ order.customer.profile.address }}</p> <!-- If address exists in profile -->
             <p>Total Price: ₹{{ order.total_price }}</p>
-            <p>Status: <span class="badge {% if order.status == 'Completed' %}bg-success{% elif order.status == 'Cancelled' %}bg-danger{% else %}bg-warning{% endif %}">{{ order.status }}</span></p>
+            <p>Order Date: {{ order.created_at|date:"M d, Y H:i A" }}</p>
+            <p>Status: 
+                <span class="badge 
+                    {% if order.status == 'Completed' %}bg-success
+                    {% elif order.status == 'Cancelled' %}bg-danger
+                    {% elif order.status == 'Processing' %}bg-warning
+                    {% else %}bg-secondary{% endif %}">
+                    {{ order.status }}
+                </span>
+            </p>
         </div>
     </div>
 
     <h4 class="mt-4">Ordered Items</h4>
     <ul class="list-group">
-        {% for item in order.items.all %}
-        <li class="list-group-item">
-            {{ item.menu_item.name }} - ₹{{ item.price }} x {{ item.quantity }}
+        {% for item in order_items %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ item.menu_item.name }}</strong><br>
+                Price: ₹{{ item.price }} x {{ item.quantity }}
+                <br>
+                Subtotal: ₹{{ item.price|floatformat:2|mul:item.quantity }}
+            </div>
+            {% if item.menu_item.image %}
+            <img src="{{ item.menu_item.image.url }}" alt="{{ item.menu_item.name }}" class="img-thumbnail" style="width: 60px; height: 60px;">
+            {% endif %}
         </li>
         {% empty %}
         <li class="list-group-item text-center">No items found.</li>
         {% endfor %}
     </ul>
 
+    {% if order.status == "Processing" %}
+    <div class="mt-3">
+        <a href="{% url 'update_order_status' order.id 'Completed' %}" class="btn btn-success">Mark as Completed</a>
+        <a href="{% url 'update_order_status' order.id 'Cancelled' %}" class="btn btn-danger">Cancel Order</a>
+    </div>
+    {% endif %}
+
     <a href="{% url 'vendor_orders' %}" class="btn btn-secondary mt-3">Back to Orders</a>
 </div>
+
 {% endblock %}

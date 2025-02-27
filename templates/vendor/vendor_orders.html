@@ -19,7 +19,9 @@
                 <tr>
                     <th>Order ID</th>
                     <th>Customer</th>
+                    <th>Items</th>
                     <th>Total Price</th>
+                    <th>Order Date</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -29,9 +31,21 @@
                 <tr>
                     <td>#{{ order.id }}</td>
                     <td>{{ order.customer.username }}</td>
-                    <td>₹{{ order.total_price }}</td>
                     <td>
-                        <span class="badge {% if order.status == 'Completed' %}bg-success{% elif order.status == 'Cancelled' %}bg-danger{% else %}bg-warning{% endif %}">
+                        <ul class="list-unstyled">
+                            {% for item in order.orderitem_set.all %}
+                            <li>{{ item.menu_item.name }} (x{{ item.quantity }})</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td>₹{{ order.total_price }}</td>
+                    <td>{{ order.created_at|date:"M d, Y H:i A" }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if order.status == 'Completed' %}bg-success
+                            {% elif order.status == 'Cancelled' %}bg-danger
+                            {% elif order.status == 'Processing' %}bg-warning
+                            {% else %}bg-secondary{% endif %}">
                             {{ order.status }}
                         </span>
                     </td>
@@ -45,11 +59,12 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="text-center">No orders found.</td>
+                    <td colspan="7" class="text-center">No orders found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
 {% endblock %}

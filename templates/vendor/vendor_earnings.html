@@ -13,10 +13,42 @@
 <div class="container mt-5">
     <h2 class="mb-4">Vendor Earnings</h2>
 
-    <div class="card p-4">
-        <h4>Total Earnings: ₹{{ earnings.total_earnings }}</h4>
-        <h5>Last Payment: ₹{{ earnings.last_payment }}</h5>
-        <h6>Last Payment Date: {{ earnings.last_payment_date|default:"N/A" }}</h6>
+    <div class="card p-4 shadow-sm">
+        <h4>Total Earnings: <strong>₹{{ total_earnings|floatformat:2 }}</strong></h4>
+        <h5>Pending Balance: <strong>₹{{ vendor.earnings.pending_balance|floatformat:2 }}</strong></h5>
+        <h5>Last Payment: <strong>₹{{ last_payment|floatformat:2 }}</strong></h5>
+        <h6>Last Payment Date: {{ last_payment_date|default:"N/A" }}</h6>
+    </div>
+
+    <div class="mt-4">
+        <h4>Completed Orders Summary</h4>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Amount Earned</th>
+                        <th>Date Completed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in vendor.order_items.all %}
+                        {% if order.order.status == "Completed" %}
+                        <tr>
+                            <td>#{{ order.order.id }}</td>
+                            <td>₹{{ order.quantity|floatformat:2|mul:order.price_at_order }}</td>
+                            <td>{{ order.order.updated_at|date:"M d, Y H:i A" }}</td>
+                        </tr>
+                        {% endif %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center">No completed orders yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
+
 {% endblock %}

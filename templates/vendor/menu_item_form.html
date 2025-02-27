@@ -11,7 +11,7 @@
 </div>
 
 <div class="container mt-5">
-    <h2 class="mb-4">{% if form.instance.pk %}Edit{% else %}Add{% endif %} Menu Item</h2>
+    <h2 class="mb-4">{% if form.instance.pk %}Edit{% else %}Add{% endif %} Vendor Menu Item</h2>
     
     {% if messages %}
     {% for message in messages %}
@@ -21,6 +21,10 @@
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
+        <div class="mb-3">
+            <label for="id_category" class="form-label">Category</label>
+            {{ form.category }}
+        </div>
         <div class="mb-3">
             <label for="id_name" class="form-label">Name</label>
             {{ form.name }}
@@ -34,11 +38,15 @@
             {{ form.price }}
         </div>
         <div class="mb-3">
+            <label for="id_is_available" class="form-label">Availability</label>
+            {{ form.is_available }}
+        </div>
+        <div class="mb-3">
             <label for="id_image" class="form-label">Image</label>
             {{ form.image }}
         </div>
         <button type="submit" class="btn btn-success">
-            {% if form.instance.pk %}Update{% else %}Add{% endif %} Item
+            {% if form.instance.pk %}Update{% else %}Add{% endif %} Vendor Item
         </button>
     </form>
 </div>

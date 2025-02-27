@@ -48,15 +48,21 @@
                                                     <div>Status</div>
                                                 </li>
 
-                                                {% if orders %}
-                                                    {% with completed_color="#047a06" processing_color="#1e73be" default_color="#d9534f" %}
-                                                        {% for order in orders %}
-                                                                    <span class="order-status {% if order.status == 'Completed' %}completed{% elif order.status == 'Processing' %}processing{% else %}default{% endif %}">
-                                                                        {{ order.status }}
-                                                                    </span>
-                                                            </li>
-                                                        {% endfor %}
-                                                    {% endwith %}
+                                                {% if vendor.order_set.all %}
+                                                    {% for order in vendor.order_set.all %}
+                                                        <li>
+                                                            <div>{{ order.id }}</div>
+                                                            <div>{{ order.created_at|date:"Y-m-d H:i" }}</div>
+                                                            <div>${{ order.get_total_price }}</div>
+                                                            <div>${{ order.get_vendor_charges }}</div>
+                                                            <div>${{ order.get_vendor_received }}</div>
+                                                            <div>
+                                                                <span class="order-status {% if order.status == 'Completed' %}completed{% elif order.status == 'Processing' %}processing{% else %}default{% endif %}">
+                                                                    {{ order.status }}
+                                                                </span>
+                                                            </div>
+                                                        </li>
+                                                    {% endfor %}
                                                 {% else %}
                                                     <li>No orders found.</li>
                                                 {% endif %}

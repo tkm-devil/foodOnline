@@ -20,18 +20,18 @@
                     <th>Order ID</th>
                     <th>Total Price</th>
                     <th>Charges</th>
-                    <th>Amount Received</th>
-                    <th>Date</th>
+                    <th>Net Earnings</th>
+                    <th>Date Completed</th>
                 </tr>
             </thead>
             <tbody>
                 {% for order in orders %}
                 <tr>
                     <td>#{{ order.id }}</td>
-                    <td>₹{{ order.total_price }}</td>
-                    <td>₹{{ order.charges }}</td>
-                    <td>₹{{ order.received }}</td>
-                    <td>{{ order.created_at|date:"M d, Y" }}</td>
+                    <td>₹{{ order.total_price|floatformat:2 }}</td>
+                    <td>₹{{ order.service_fee|floatformat:2 }}</td>
+                    <td>₹{{ order.total_price|floatformat:2|sub:order.service_fee }}</td>
+                    <td>{{ order.updated_at|date:"M d, Y H:i A" }}</td>
                 </tr>
                 {% empty %}
                 <tr>
@@ -42,4 +42,5 @@
         </table>
     </div>
 </div>
+
 {% endblock %}
