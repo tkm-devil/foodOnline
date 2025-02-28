@@ -22,8 +22,8 @@ class VendorMenuItemForm(forms.ModelForm):
         fields = ['name', 'description', 'price', 'image', 'is_available']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter item name'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter item description'}),
-            'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter item description', 'rows': 3}),
+            'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'is_available': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
@@ -31,7 +31,10 @@ class VendorMenuItemForm(forms.ModelForm):
     def clean_name(self):
         """Ensure a vendor does not add duplicate menu items."""
         name = self.cleaned_data.get('name')
-        vendor = self.instance.vendor if self.instance.pk else None  # Get the vendor if updating
-        if vendor and VendorMenuItem.objects.filter(vendor=vendor, name=name).exclude(pk=self.instance.pk).exists():
-            raise forms.ValidationError("You already have an item with this name in your menu.")
+
+        if self.instance and self.instance.pk:  # ✅ Only check existing items
+            vendor = self.instance.vendor
+            if VendorMenuItem.objects.filter(vendor=vendor, name=name).exclude(pk=self.instance.pk).exists():
+                raise forms.ValidationError("You already have an item with this name in your menu.")
+
         return name

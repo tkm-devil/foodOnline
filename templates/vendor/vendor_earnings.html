@@ -15,7 +15,7 @@
 
     <div class="card p-4 shadow-sm">
         <h4>Total Earnings: <strong>₹{{ total_earnings|floatformat:2 }}</strong></h4>
-        <h5>Pending Balance: <strong>₹{{ vendor.earnings.pending_balance|floatformat:2 }}</strong></h5>
+        <h5>Pending Balance: <strong>₹{{ pending_balance|floatformat:2 }}</strong></h5>
         <h5>Last Payment: <strong>₹{{ last_payment|floatformat:2 }}</strong></h5>
         <h6>Last Payment Date: {{ last_payment_date|default:"N/A" }}</h6>
     </div>
@@ -32,14 +32,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for order in vendor.order_items.all %}
-                        {% if order.order.status == "Completed" %}
-                        <tr>
-                            <td>#{{ order.order.id }}</td>
-                            <td>₹{{ order.quantity|floatformat:2|mul:order.price_at_order }}</td>
-                            <td>{{ order.order.updated_at|date:"M d, Y H:i A" }}</td>
-                        </tr>
-                        {% endif %}
+                    {% for order_item in completed_orders %}
+                    <tr>
+                        <td>#{{ order_item.order.id }}</td>
+                        <td>₹{% widthratio order_item.quantity 1 order_item.price_at_order %}</td>
+                        <td>{{ order_item.order.updated_at|date:"M d, Y H:i A" }}</td>
+                    </tr>
                     {% empty %}
                     <tr>
                         <td colspan="3" class="text-center">No completed orders yet.</td>

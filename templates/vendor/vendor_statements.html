@@ -19,7 +19,7 @@
                 <tr>
                     <th>Order ID</th>
                     <th>Total Price</th>
-                    <th>Charges</th>
+                    <th>Charges ({{ SERVICE_FEE_PERCENTAGE }}%)</th>
                     <th>Net Earnings</th>
                     <th>Date Completed</th>
                 </tr>
@@ -30,8 +30,8 @@
                     <td>#{{ order.id }}</td>
                     <td>₹{{ order.total_price|floatformat:2 }}</td>
                     <td>₹{{ order.service_fee|floatformat:2 }}</td>
-                    <td>₹{{ order.total_price|floatformat:2|sub:order.service_fee }}</td>
-                    <td>{{ order.updated_at|date:"M d, Y H:i A" }}</td>
+                    <td>₹{{ order.net_earnings|floatformat:2 }}</td>
+                    <td>{{ order.date_completed|date:"M d, Y H:i A" }}</td>
                 </tr>
                 {% empty %}
                 <tr>

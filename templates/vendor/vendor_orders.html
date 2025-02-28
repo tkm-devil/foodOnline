@@ -33,13 +33,13 @@
                     <td>{{ order.customer.username }}</td>
                     <td>
                         <ul class="list-unstyled">
-                            {% for item in order.orderitem_set.all %}
+                            {% for item in order.order_items.all %}
                             <li>{{ item.menu_item.name }} (x{{ item.quantity }})</li>
                             {% endfor %}
                         </ul>
                     </td>
                     <td>₹{{ order.total_price }}</td>
-                    <td>{{ order.created_at|date:"M d, Y H:i A" }}</td>
+                    <td>{{ order.created_at|date:"M d, Y - h:i A" }}</td>
                     <td>
                         <span class="badge 
                             {% if order.status == 'Completed' %}bg-success
@@ -59,7 +59,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="text-center">No orders found.</td>
+                    <td colspan="7" class="text-center text-muted">No orders found.</td>
                 </tr>
                 {% endfor %}
             </tbody>

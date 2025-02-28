@@ -17,8 +17,14 @@
         <div class="card-body">
             <h5 class="card-title">Customer: {{ order.customer.username }}</h5>
             <p>Email: {{ order.customer.email }}</p>
-            <p>Phone: {{ order.customer.profile.phone_number }}</p> <!-- If phone number exists in profile -->
-            <p>Address: {{ order.customer.profile.address }}</p> <!-- If address exists in profile -->
+            {% if order.customer.profile %}
+                {% if order.customer.profile.phone_number %}
+                    <p>Phone: {{ order.customer.profile.phone_number }}</p>
+                {% endif %}
+                {% if order.customer.profile.address %}
+                    <p>Address: {{ order.customer.profile.address }}</p>
+                {% endif %}
+            {% endif %}
             <p>Total Price: ₹{{ order.total_price }}</p>
             <p>Order Date: {{ order.created_at|date:"M d, Y H:i A" }}</p>
             <p>Status: 
@@ -39,9 +45,9 @@
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <div>
                 <strong>{{ item.menu_item.name }}</strong><br>
-                Price: ₹{{ item.price }} x {{ item.quantity }}
+                Price: ₹{{ item.price_at_order }} x {{ item.quantity }}
                 <br>
-                Subtotal: ₹{{ item.price|floatformat:2|mul:item.quantity }}
+                Subtotal: ₹{{ item.price_at_order|floatformat:2|mul:item.quantity }}
             </div>
             {% if item.menu_item.image %}
             <img src="{{ item.menu_item.image.url }}" alt="{{ item.menu_item.name }}" class="img-thumbnail" style="width: 60px; height: 60px;">

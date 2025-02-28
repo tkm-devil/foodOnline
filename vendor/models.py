@@ -1,5 +1,6 @@
 from django.db import models
-from accounts.models import User, UserProfile
+from django.db.models import Sum, F
+from accounts.models import User
 from foodOnline_main import settings
 from django.core.mail import send_mail
 
@@ -7,7 +8,6 @@ from django.core.mail import send_mail
 class Vendor(models.Model):
     """Represents a vendor who sells food items."""
     user = models.OneToOneField(User, related_name='vendor', on_delete=models.CASCADE)
-    user_profile = models.OneToOneField(UserProfile, related_name='vendor_profile', on_delete=models.CASCADE)
     vendor_name = models.CharField(max_length=50)
     vendor_license = models.ImageField(upload_to='vendor/licenses/', blank=True, null=True)
     is_verified = models.BooleanField(default=False)
@@ -23,9 +23,9 @@ class Vendor(models.Model):
 
     def __str__(self):
         return self.vendor_name
-    
+
     def save(self, *args, **kwargs):
-        """Override save method to send verification email when vendor is verified."""
+        """Send verification email when vendor is verified."""
         if self.pk:
             old_instance = Vendor.objects.filter(pk=self.pk).first()
             if old_instance and not old_instance.is_verified and self.is_verified:
@@ -45,14 +45,14 @@ class Vendor(models.Model):
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.user.email], fail_silently=False)
 
 
-# ✅ VendorMenuItem Model (Independent)
+# ✅ VendorMenuItem Model
 class VendorMenuItem(models.Model):
     """Stores menu items created by vendors."""
     vendor = models.ForeignKey(Vendor, related_name="vendor_menu", on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)  # Food item name
+    name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     image = models.ImageField(upload_to="vendor_menu_items/", blank=True, null=True)
-    price = models.DecimalField(max_digits=8, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2)  # Increased max_digits for better scalability
     is_available = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -68,18 +68,23 @@ class VendorMenuItem(models.Model):
         return f"{self.name} - {self.vendor.vendor_name} @ ₹{self.price}"
 
 
+# ✅ Order Status Choices
+class OrderStatus(models.TextChoices):
+    PROCESSING = 'Processing', 'Processing'
+    COMPLETED = 'Completed', 'Completed'
+    CANCELLED = 'Cancelled', 'Cancelled'
+
+
 # ✅ Order Model
 class Order(models.Model):
     """Represents a customer's order."""
-    STATUS_CHOICES = [
-        ('Processing', 'Processing'),
-        ('Completed', 'Completed'),
-        ('Cancelled', 'Cancelled'),
-    ]
-
     customer = models.ForeignKey(User, related_name="orders", on_delete=models.CASCADE)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Processing')
+    status = models.CharField(
+        max_length=20,
+        choices=OrderStatus.choices,
+        default=OrderStatus.PROCESSING
+    )
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -92,14 +97,13 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.id} - {self.customer.username} - {self.status}"
-    
+
     def save(self, *args, **kwargs):
         """Update vendor earnings when an order is completed."""
         super().save(*args, **kwargs)
-        if self.status == 'Completed':
-            vendors = self.order_items.values_list('vendor', flat=True).distinct()
-            for vendor_id in vendors:
-                vendor = Vendor.objects.get(id=vendor_id)
+        if self.status == OrderStatus.COMPLETED:
+            vendors = Vendor.objects.filter(order_items__order=self).distinct()
+            for vendor in vendors:
                 vendor.earnings.update_earnings()
 
 
@@ -110,7 +114,7 @@ class OrderItem(models.Model):
     vendor = models.ForeignKey(Vendor, related_name="order_items", on_delete=models.CASCADE)
     menu_item = models.ForeignKey(VendorMenuItem, related_name="order_items", on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-    price_at_order = models.DecimalField(max_digits=8, decimal_places=2)
+    price_at_order = models.DecimalField(max_digits=10, decimal_places=2)  # Increased max_digits
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -139,11 +143,13 @@ class Earnings(models.Model):
 
     def __str__(self):
         return f"Earnings for {self.vendor.vendor_name}: ₹{self.total_earnings}"
-    
+
     def update_earnings(self):
         """Recalculate vendor earnings based on completed orders."""
-        completed_orders = self.vendor.order_items.filter(order__status='Completed')
-        total_earned = sum(order_item.quantity * order_item.price_at_order for order_item in completed_orders)
+        total_earned = self.vendor.order_items.filter(order__status=OrderStatus.COMPLETED).aggregate(
+            total=Sum(F('quantity') * F('price_at_order'))
+        )['total'] or 0  # Defaults to 0 if no completed orders
+
         self.total_earnings = total_earned
         self.pending_balance = total_earned - self.last_payment
         self.save()
